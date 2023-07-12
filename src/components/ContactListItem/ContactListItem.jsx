@@ -1,22 +1,36 @@
-import PropTypes from 'prop-types';
 import {} from './ContactListItem.styled';
+import { deleteContact } from 'redux/contactsSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import Notiflix from 'notiflix';
 
 const ContactListItem = ({ name, number, onDeleteContact }) => {
-  return (
-    <li>
-      {name}: {number}
-      <button type="button" onClick={onDeleteContact}>
-        Delete
-      </button>
-    </li>
-  );
-};
+  const dispatch = useDispatch();
 
-ContactListItem.propTypes = {
-  id: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
-  onDeleteContact: PropTypes.func.isRequired,
+  const contactsState = useSelector(state => state.contacts.contacts);
+  const filterState = useSelector(state => state.filter);
+
+  function getVisibleContacts() {
+    const normalizedFilter = filterState.toLowerCase();
+    return contactsState.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
+  }
+
+  const handleDelete = (id, name) => {
+    dispatch(deleteContact(id));
+    Notiflix.Notify.success(`Contact ${name} deleted successfully`);
+  };
+
+  return getVisibleContacts().map(({ id, name, number }) => {
+    return (
+      <li key={id}>
+        {name}: {number}
+        <button type="button" onClick={() => handleDelete(id, name)}>
+          Delete
+        </button>
+      </li>
+    );
+  });
 };
 
 export default ContactListItem;
