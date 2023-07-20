@@ -29,20 +29,25 @@ const ContactForm = ({ onSubmit }) => {
   const handleSubmit = e => {
     e.preventDefault();
 
-    for (const contact of contacts) {
-      if (
-        contact.name.toLowerCase() ===
-        e.target.elements.name.value.toLowerCase()
-      ) {
-        Notiflix.Notify.failure(`${[name]} is already exist`);
-        return;
-      } else if (contact.number === e.target.elements.number.value) {
-        return Notiflix.Notify.failure(
-          `${e.target.elements.number.value} is already exist`
-        );
-      }
+    if (
+      contacts.some(
+        contact =>
+          contact.name.toLowerCase() ===
+          e.target.elements.name.value.toLowerCase()
+      )
+    ) {
+      Notiflix.Notify.failure(`Name ${[name]} is already exist`);
+      return;
+    } else if (
+      contacts.some(
+        contact => contact.number === e.target.elements.number.value
+      )
+    ) {
+      Notiflix.Notify.failure(
+        `Number ${e.target.elements.number.value} is already exist`
+      );
+      return;
     }
-
     dispatch(
       addContact({
         name: e.target.elements.name.value,
